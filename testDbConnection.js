@@ -22,4 +22,3 @@ connection.connect((err) => {
   }
   connection.end(); // Закриваємо з'єднання
 });
-авж;
