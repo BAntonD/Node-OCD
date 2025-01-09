@@ -22,3 +22,32 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Помилка:', error.message);
     });
 });
+
+document.getElementById('calculate-btn').addEventListener('click', () => {
+  // Виконати обчислення і оновити результати
+  console.log("Calculating...");
+
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const vulnerabilityInput = document.getElementById('vulnerability-input');
+  const percentRadio = document.getElementById('vulnerability-percent');
+  const valueRadio = document.getElementById('vulnerability-value');
+
+  // Функція для оновлення плейсхолдера та логіки
+  const updatePlaceholder = () => {
+    if (percentRadio.checked) {
+      vulnerabilityInput.placeholder = 'Введіть відсоток';
+    } else if (valueRadio.checked) {
+      vulnerabilityInput.placeholder = 'Введіть числове значення';
+    }
+  };
+
+  // Додаємо обробники подій
+  [percentRadio, valueRadio].forEach((radio) =>
+    radio.addEventListener('change', updatePlaceholder)
+  );
+
+  updatePlaceholder();
+});

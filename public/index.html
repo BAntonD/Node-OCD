@@ -63,6 +63,12 @@
   <!-- Центральний блок: Результати -->
   <div class="block">
     <h2>Результати</h2>
+  
+    <!-- Кнопка обчислення -->
+    <div class="calculate-btn-container">
+      <button id="calculate-btn" class="calculate-btn">Обчислити</button>
+    </div>
+
     <div class="result">
       <h3>Стандартна атака</h3>
       <p>Пошкодження в секунду: <label id="dps-standard">1000</label></p>
@@ -88,20 +94,55 @@
   <!-- Правий блок: Вибір ворога -->
   <div class="block">
     <h2>Вибір ворога</h2>
-    <label for="enemy-select">Ворог:</label>
+    
+    <!-- Вибір ворога -->
+    <label for="enemy-select">
+      <input type="checkbox" id="enemy-checkbox" checked>Ворог:
+    </label>
     <select id="enemy-select">
       <option value="">Вибрати ворога</option>
     </select>
 
-    <label for="defense-input">Захист:</label>
-    <input type="text" id="defense-input" class="input-field">
+    <!-- Вибір типу def/res/nothing -->
+    <div class="parameter-selection">
+      <div>
+        <input type="radio" id="def-option" name="parameter" value="def">
+        <label for="def-option">def</label>
 
+        <input type="radio" id="res-option" name="parameter" value="res">
+        <label for="res-option">res</label>
+
+        <input type="radio" id="nothing-option" name="parameter" value="nothing" checked>
+        <label for="nothing-option">nothing</label>
+      </div>
+    </div>
+    
+    <!-- Захист -->
+    <label for="defense-input"></label>
+    <input type="text" id="defense-input" class="input-field">
+    
+    <!-- Резист -->
     <label for="resist-input">Резист:</label>
     <input type="text" id="resist-input" class="input-field">
-
+    
+    <!-- HP -->
     <label for="hp-input">HP:</label>
     <input type="text" id="hp-input" class="input-field">
+    
+    <!-- Vulnerability -->
+    <label for="vulnerability-type">Вразливість:</label>
+    <div>
+      <!-- Вибір між відсотками або числовим значенням -->
+      <label>
+        <input type="radio" name="vulnerability-type" value="percent" id="vulnerability-percent" checked> Відсоток (%)
+      </label>
+      <label>
+        <input type="radio" name="vulnerability-type" value="value" id="vulnerability-value" checked> Числове значення
+      </label>
+    </div>
+    <input type="number" id="vulnerability-input" class="input-field" placeholder="Введіть значення">
   </div>
+
 </div>
 
 <script src="script.js"></script>
