@@ -1,109 +1,135 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Calculator</title>
-</head>
-<body>
-<div class="container">
-  <!-- Лівий блок: Вибір оператора -->
-  <div class="block">
-    <h2>Вибір оператора</h2>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Calculator</title>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Лівий блок: Вибір оператора -->
+      <div class="block">
+        <h2>Вибір оператора</h2>
 
-    <!-- Вибір оператора -->
-    <select id="operator-select">
-      <option value="">Вибрати оператора</option>
-    </select>
+        <!-- Вибір оператора -->
+        <select id="operator-select">
+          <option value="">Вибрати оператора</option>
+        </select>
 
-    <!-- Trait -->
-    <p>Trait: <span id="trait-label">-</span></p>
+        <!-- Trait -->
+        <p>Trait: <span id="trait-label">-</span></p>
 
-    <!-- Талант -->
-    <select id="talent-select">
-      <option value="">Вибрати талант</option>
-    </select>
+        <!-- Талант -->
+        <select id="talent-select">
+          <option value="">Вибрати талант</option>
+        </select>
 
-    <!-- Навичка -->
-    <select id="skill-select">
-      <option value="">Вибрати навичку</option>
-    </select>
+        <!-- Навичка -->
+        <select id="skill-select">
+          <option value="">Вибрати навичку</option>
+        </select>
 
-    <!-- Атака -->
-    <p>Atk: <span id="atk-label">1000</span></p>
+        <!-- Атака -->
+        <p>Atk: <span id="atk-label">1000</span></p>
 
-    <!-- Потенціал -->
-    <input type="checkbox" id="pot-checkbox" checked>
-    <label>Pot:</label>
-    <span id="pot-label">5</span>
+        <!-- Потенціал -->
+        <input type="checkbox" id="pot-checkbox" checked />
+        <label>Pot:</label>
+        <span id="pot-label">5</span>
 
-    <!-- Inspiration -->
-    <p><label for="inspiration-input">Inspiration:</label>
-    <input type="text" id="inspiration-input" class="input-field">
+        <!-- Inspiration -->
+        <p>
+          <label for="inspiration-input">Inspiration:</label>
+          <input type="text" id="inspiration-input" class="input-field" />
 
-    <!-- Trust -->
-    <input type="checkbox" id="trust-checkbox" checked>
-    <label>Trust:</label>
-    <span id="trust-label">300</span>
+          <!-- Trust -->
+          <input type="checkbox" id="trust-checkbox" checked />
+          <label>Trust:</label>
+          <span id="trust-label">300</span>
 
-    <!-- Talent Atk -->
-    <p><label for="talent-atk-input">Talent Atk:</label>
-    <input type="text" id="talent-atk-input" class="input-field">
+          <!-- Talent Atk -->
+        </p>
 
-    <!-- 2(*) modifiers -->
-    <p>2(*) modifiers</p>
-    <input type="text" id="modifier1-input" class="input-field" placeholder="Modifier 1">
-    <input type="text" id="modifier2-input" class="input-field" placeholder="Modifier 2">
-    <p>Крит</p>
-    <input type="text" id="crit-chance-input" class="input-field" placeholder="Шанс крита">
-    <input type="text" id="crit-modifier-input" class="input-field" placeholder="Модифікатор крита">
-  </div>
+        <p>
+          <label for="talent-atk-input">Talent Atk:</label>
+          <input type="text" id="talent-atk-input" class="input-field" />
 
-  <!-- Центральний блок: Результати -->
-  <div class="block">
-    <h2>Результати</h2>
-    <div class="result">
-      <h3>Стандартна атака</h3>
-      <p>Пошкодження в секунду: <label id="dps-standard">1000</label></p>
-      <p>Пошкодження: <label id="damage-standard">5000</label></p>
-      <p>Відсоток: <label id="percent-standard">50%</label></p>
+          <!-- 2(*) modifiers -->
+        </p>
+
+        <p>2(*) modifiers</p>
+        <input
+          type="text"
+          id="modifier1-input"
+          class="input-field"
+          placeholder="Modifier 1"
+        />
+        <input
+          type="text"
+          id="modifier2-input"
+          class="input-field"
+          placeholder="Modifier 2"
+        />
+        <p>Крит</p>
+        <input
+          type="text"
+          id="crit-chance-input"
+          class="input-field"
+          placeholder="Шанс крита"
+        />
+        <input
+          type="text"
+          id="crit-modifier-input"
+          class="input-field"
+          placeholder="Модифікатор крита"
+        />
+      </div>
+
+      <!-- Центральний блок: Результати -->
+      <div class="block">
+        <h2>Результати</h2>
+        <div class="result">
+          <h3>Стандартна атака</h3>
+          <p>Пошкодження в секунду: <label id="dps-standard">1000</label></p>
+          <p>Пошкодження: <label id="damage-standard">5000</label></p>
+          <p>Відсоток: <label id="percent-standard">50%</label></p>
+        </div>
+
+        <div class="result">
+          <h3>Крит</h3>
+          <p>Пошкодження в секунду: <label id="dps-crit">1500</label></p>
+          <p>Пошкодження: <label id="damage-crit">7500</label></p>
+          <p>Відсоток: <label id="percent-crit">75%</label></p>
+        </div>
+
+        <div class="result">
+          <h3>Середня атака</h3>
+          <p>Пошкодження в секунду: <label id="dps-average">1200</label></p>
+          <p>Пошкодження: <label id="damage-average">6000</label></p>
+          <p>Відсоток: <label id="percent-average">60%</label></p>
+        </div>
+      </div>
+
+      <!-- Правий блок: Вибір ворога -->
+      <div class="block">
+        <h2>Вибір ворога</h2>
+        <label for="enemy-select">Ворог:</label>
+        <select id="enemy-select">
+          <option value="">Вибрати ворога</option>
+        </select>
+
+        <label for="defense-input">Захист:</label>
+        <input type="text" id="defense-input" class="input-field" />
+
+        <label for="resist-input">Резист:</label>
+        <input type="text" id="resist-input" class="input-field" />
+
+        <label for="hp-input">HP:</label>
+        <input type="text" id="hp-input" class="input-field" />
+      </div>
     </div>
 
-    <div class="result">
-      <h3>Крит</h3>
-      <p>Пошкодження в секунду: <label id="dps-crit">1500</label></p>
-      <p>Пошкодження: <label id="damage-crit">7500</label></p>
-      <p>Відсоток: <label id="percent-crit">75%</label></p>
-    </div>
-
-    <div class="result">
-      <h3>Середня атака</h3>
-      <p>Пошкодження в секунду: <label id="dps-average">1200</label></p>
-      <p>Пошкодження: <label id="damage-average">6000</label></p>
-      <p>Відсоток: <label id="percent-average">60%</label></p>
-    </div>
-  </div>
-
-  <!-- Правий блок: Вибір ворога -->
-  <div class="block">
-    <h2>Вибір ворога</h2>
-    <label for="enemy-select">Ворог:</label>
-    <select id="enemy-select">
-      <option value="">Вибрати ворога</option>
-    </select>
-
-    <label for="defense-input">Захист:</label>
-    <input type="text" id="defense-input" class="input-field">
-
-    <label for="resist-input">Резист:</label>
-    <input type="text" id="resist-input" class="input-field">
-
-    <label for="hp-input">HP:</label>
-    <input type="text" id="hp-input" class="input-field">
-  </div>
-</div>
-
-<script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
