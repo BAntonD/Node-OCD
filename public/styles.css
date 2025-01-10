@@ -76,8 +76,16 @@ input:disabled, span.disabled {
   
 .calculate-btn:active {
     background-color: #3e8e41;
-}  
+}
 
+/* Стилі для сірого кольору при вимкненому чекбоксі */
+input[type="checkbox"]:not(:checked) + label + span {
+    color: #888; /* сірий колір для тексту */
+}
+
+input[type="checkbox"]:not(:checked) {
+    background-color: #ddd; /* сірий фон для чекбоксу */
+}
 
 
   
