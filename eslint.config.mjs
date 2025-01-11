@@ -6,8 +6,8 @@ export default [
   {
     languageOptions: {
       globals: {
-        ...globals.node, // Для бекенду
-        ...globals.browser, // Додаємо середовище браузера
+        ...globals.node, // зберігаємо підтримку для Node.js
+        ...globals.browser, // додаємо підтримку для браузерних глобальних змінних
       },
     },
   },
