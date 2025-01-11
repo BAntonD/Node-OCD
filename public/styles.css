@@ -3,6 +3,7 @@ body {
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
+
 }
 
 .container {
@@ -21,7 +22,6 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 .block h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -49,3 +49,32 @@ input:disabled,
 span.disabled {
   color: #aaa;
 }
+
+/* Додатковий відступ між групами радіокнопок і полями */
+.block div {
+    margin: 10px 0;
+}
+
+
+.calculate-btn-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.calculate-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .calculate-btn:hover {
+        background-color: #45a049;
+    }
+
+    .calculate-btn:active {
+        background-color: #3e8e41;
+    }
