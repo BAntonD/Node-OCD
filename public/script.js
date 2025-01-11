@@ -34,9 +34,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ------------------- Фіктивні дані -------------------
   const enemies = [
-      { id: 1, name: 'Goblin', defense: 50, resist: 10, hp: 100, vulnerability: 20 },
-      { id: 2, name: 'Troll', defense: 100, resist: 30, hp: 300, vulnerability: 15 },
-      { id: 3, name: 'Dragon', defense: 200, resist: 50, hp: 1000, vulnerability: 25 },
+    {
+      id: 1,
+      name: 'Goblin',
+      defense: 50,
+      resist: 10,
+      hp: 100,
+      vulnerability: 20,
+    },
+    {
+      id: 2,
+      name: 'Troll',
+      defense: 100,
+      resist: 30,
+      hp: 300,
+      vulnerability: 15,
+    },
+    {
+      id: 3,
+      name: 'Dragon',
+      defense: 200,
+      resist: 50,
+      hp: 1000,
+      vulnerability: 25,
+    },
   ];
 
   // Встановлення початкових значень
@@ -59,100 +80,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Завантаження операторів
   const loadOperators = async () => {
-      operatorSelect.innerHTML = '<option>Завантаження...</option>';
-      try {
-          const response = await fetch('/operators');
-          if (!response.ok) throw new Error('Помилка завантаження операторів');
-          const operators = await response.json();
-          operatorSelect.innerHTML = '<option value="">Вибрати оператора</option>';
-          operators.forEach((operator) => {
-              const option = document.createElement('option');
-              option.value = operator.id;
-              option.textContent = operator.name;
-              operatorSelect.appendChild(option);
-          });
-      } catch (error) {
-          operatorSelect.innerHTML = '<option>Помилка завантаження</option>';
-          console.error('Помилка:', error.message);
-      }
+    operatorSelect.innerHTML = '<option>Завантаження...</option>';
+    try {
+      const response = await fetch('/operators');
+      if (!response.ok) throw new Error('Помилка завантаження операторів');
+      const operators = await response.json();
+      operatorSelect.innerHTML = '<option value="">Вибрати оператора</option>';
+      operators.forEach((operator) => {
+        const option = document.createElement('option');
+        option.value = operator.id;
+        option.textContent = operator.name;
+        operatorSelect.appendChild(option);
+      });
+    } catch (error) {
+      operatorSelect.innerHTML = '<option>Помилка завантаження</option>';
+      console.error('Помилка:', error.message);
+    }
   };
-
 
   // Увімкнення/вимкнення текстових полів і радіокнопок
   const toggleFields = () => {
-      const isEnabled = !enemyCheckbox.checked;
+    const isEnabled = !enemyCheckbox.checked;
+    [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
+      (input) => (input.disabled = isEnabled),
+    );
+    [...vulnerabilityRadios, ...parameterRadios].forEach(
+      (radio) => (radio.disabled = isEnabled),
+    );
+    if (isEnabled) {
+      // Скидання полів при активному чекбоксі
       [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
-          (input) => (input.disabled = isEnabled)
+        (input) => (input.value = ''),
       );
-      [...vulnerabilityRadios, ...parameterRadios].forEach(
-          (radio) => (radio.disabled = isEnabled)
-      );
-      if (isEnabled) {
-          // Скидання полів при активному чекбоксі
-          [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
-              (input) => (input.value = '')
-          );
-          percentRadio.checked = false;
-          valueRadio.checked = false;
-          nothingOption.checked = true;
-      }
+      percentRadio.checked = false;
+      valueRadio.checked = false;
+      nothingOption.checked = true;
+    }
   };
 
   // Оновлення полів при виборі ворога
   const updateEnemyFields = () => {
-      const selectedEnemy = enemies.find(
-          (enemy) => enemy.id === parseInt(enemySelect.value, 10)
-      );
-      if (selectedEnemy && enemyCheckbox.checked) {
-          defenseInput.value = selectedEnemy.defense;
-          resistInput.value = selectedEnemy.resist;
-          hpInput.value = selectedEnemy.hp;
-          vulnerabilityInput.value = selectedEnemy.vulnerability;
-          percentRadio.checked = true;
-          nothingOption.checked = true;
-      }
+    const selectedEnemy = enemies.find(
+      (enemy) => enemy.id === parseInt(enemySelect.value, 10),
+    );
+    if (selectedEnemy && enemyCheckbox.checked) {
+      defenseInput.value = selectedEnemy.defense;
+      resistInput.value = selectedEnemy.resist;
+      hpInput.value = selectedEnemy.hp;
+      vulnerabilityInput.value = selectedEnemy.vulnerability;
+      percentRadio.checked = true;
+      nothingOption.checked = true;
+    }
   };
 
   // Розрахунок пошкодження
   const calculateDamage = () => {
-      // Базові значення
-      let damage =
-          parseFloat(baseAtk.textContent) +
-          parseFloat(trustAtk.textContent) +
-          parseFloat(potAtk.textContent) +
-          parseFloat(talentAtk.value || 0);
-      damage *= 1 + parseFloat(modifier1.value || 0) / 100;
-      damage *= 1 + parseFloat(modifier2.value || 0) / 100;
-      damage += parseFloat(inspiration.value || 0);
+    // Базові значення
+    let damage =
+      parseFloat(baseAtk.textContent) +
+      parseFloat(trustAtk.textContent) +
+      parseFloat(potAtk.textContent) +
+      parseFloat(talentAtk.value || 0);
+    damage *= 1 + parseFloat(modifier1.value || 0) / 100;
+    damage *= 1 + parseFloat(modifier2.value || 0) / 100;
+    damage += parseFloat(inspiration.value || 0);
 
-      // Захисний ефект
-      const defense = parseFloat(defenseInput.value || 0);
-      const resist = parseFloat(resistInput.value || 0);
-      if (defOption.checked) {
-          damage -= defense;
-      } else if (resOption.checked) {
-          const resistFactor = Math.max(1 - resist / 100, 0.05);
-          damage *= resistFactor;
-      }
+    // Захисний ефект
+    const defense = parseFloat(defenseInput.value || 0);
+    const resist = parseFloat(resistInput.value || 0);
+    if (defOption.checked) {
+      damage -= defense;
+    } else if (resOption.checked) {
+      const resistFactor = Math.max(1 - resist / 100, 0.05);
+      damage *= resistFactor;
+    }
 
-      // Вразливість
-      const vulnerabilityValue = parseFloat(vulnerabilityInput.value || 0);
-      if (percentRadio.checked) {
-          damage *= 1 + vulnerabilityValue / 100;
-      } else {
-          damage += vulnerabilityValue;
-      }
+    // Вразливість
+    const vulnerabilityValue = parseFloat(vulnerabilityInput.value || 0);
+    if (percentRadio.checked) {
+      damage *= 1 + vulnerabilityValue / 100;
+    } else {
+      damage += vulnerabilityValue;
+    }
 
-      // Мінімальне пошкодження
-      const minDamage = parseFloat(baseAtk.textContent) * 0.05;
-      damage = Math.max(damage, minDamage);
+    // Мінімальне пошкодження
+    const minDamage = parseFloat(baseAtk.textContent) * 0.05;
+    damage = Math.max(damage, minDamage);
 
-      // Оновлення результатів
-      dpsStandard.textContent = Math.round(damage);
-      damageStandard.textContent = Math.round(damage * 5); // Загальне пошкодження за 5 секунд
-      percentStandard.textContent = `${Math.round(
-          (damage / parseFloat(baseAtk.textContent)) * 100
-      )}%`;
+    // Оновлення результатів
+    dpsStandard.textContent = Math.round(damage);
+    damageStandard.textContent = Math.round(damage * 5); // Загальне пошкодження за 5 секунд
+    percentStandard.textContent = `${Math.round(
+      (damage / parseFloat(baseAtk.textContent)) * 100,
+    )}%`;
   };
 
   // ------------------- Події -------------------
