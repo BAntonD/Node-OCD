@@ -1,92 +1,88 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #4CAF50;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #4caf50;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .block {
-    width: 30%;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .block h2 {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 label {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .input-field {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .result {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 /* Для вимкнених елементів */
-input:disabled, span.disabled {
-    color: #aaa;
+input:disabled,
+span.disabled {
+  color: #aaa;
 }
 
 /* Додатковий відступ між групами радіокнопок і полями */
 .block div {
-    margin: 10px 0;
+  margin: 10px 0;
 }
-
 
 .calculate-btn-container {
-    text-align: center;
-    margin-top: 20px;
+  text-align: center;
+  margin-top: 20px;
 }
-  
+
 .calculate-btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
-  
+
 .calculate-btn:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
-  
+
 .calculate-btn:active {
-    background-color: #3e8e41;
+  background-color: #3e8e41;
 }
 
 /* Стилі для сірого кольору при вимкненому чекбоксі */
-input[type="checkbox"]:not(:checked) + label + span {
-    color: #888; /* сірий колір для тексту */
+input[type='checkbox']:not(:checked) + label + span {
+  color: #888; /* сірий колір для тексту */
 }
 
-input[type="checkbox"]:not(:checked) {
-    background-color: #ddd; /* сірий фон для чекбоксу */
+input[type='checkbox']:not(:checked) {
+  background-color: #ddd; /* сірий фон для чекбоксу */
 }
-
-
-  
-  
