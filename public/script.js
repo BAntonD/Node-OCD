@@ -1,14 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // ------------------- Змінні -------------------
   const operatorSelect = document.getElementById('operator-select');
   const talentSelect = document.getElementById('talent-select');
   const talentDescription = document.getElementById('talent-description');
   const skillSelect = document.getElementById('skill-select');
   const skillDescription = document.getElementById('skill-description');
+  const calculateBtn = document.getElementById('calculate-btn');
 
+  // Ліва частина
   const trustLabel = document.getElementById('trust-label');
   const atkLabel = document.getElementById('atk-label');
   const potLabel = document.getElementById('pot-label');
   const traitLabel = document.getElementById('trait-label');
+  const modifier1 = document.getElementById('modifier1-input');
+  const modifier2 = document.getElementById('modifier2-input');
+  const inspiration = document.getElementById('inspiration-input');
+
+  // Права частина (враховуючи ворога)
+  const enemyCheckbox = document.getElementById('enemy-checkbox');
+  const enemySelect = document.getElementById('enemy-select');
+  const defenseInput = document.getElementById('defense-input');
+  const resistInput = document.getElementById('resist-input');
+  const hpInput = document.getElementById('hp-input');
+  const vulnerabilityInput = document.getElementById('vulnerability-input');
+  const percentRadio = document.getElementById('vulnerability-percent');
+  const valueRadio = document.getElementById('vulnerability-value');
+  const defOption = document.getElementById('def-option');
+  const resOption = document.getElementById('res-option');
+  const nothingOption = document.getElementById('nothing-option');
+  const dpsStandard = document.getElementById('dps-standard');
+  const damageStandard = document.getElementById('damage-standard');
+  const percentStandard = document.getElementById('percent-standard');
+
+  // Початкові дані для ворога
+  const enemies = [
+    {
+      id: 1,
+      name: 'Goblin',
+      defense: 50,
+      resist: 10,
+      hp: 100,
+      vulnerability: 20,
+    },
+    {
+      id: 2,
+      name: 'Troll',
+      defense: 100,
+      resist: 30,
+      hp: 300,
+      vulnerability: 15,
+    },
+    {
+      id: 3,
+      name: 'Dragon',
+      defense: 200,
+      resist: 50,
+      hp: 1000,
+      vulnerability: 25,
+    },
+  ];
 
   // Завантаження операторів
   fetch('/getOperators')
@@ -22,17 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+  // Завантаження характеристик оператора
   operatorSelect.addEventListener('change', () => {
     const operatorId = operatorSelect.value;
 
     if (operatorId) {
-      // Очищення полів талантів, навичок та їх описів
       talentSelect.innerHTML = '<option value="">Вибрати талант</option>';
       skillSelect.innerHTML = '<option value="">Вибрати навичку</option>';
       talentDescription.textContent = 'Опис таланту буде тут';
       skillDescription.textContent = 'Опис навички буде тут';
 
-      // Завантаження характеристик оператора
       fetch(`/operator/${operatorId}`)
         .then((response) => response.json())
         .then((data) => {
@@ -42,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
           traitLabel.textContent = data.trait;
         });
 
-      // Завантаження талантів
       fetch(`/operator/${operatorId}/talents`)
         .then((response) => response.json())
         .then((data) => {
@@ -50,81 +98,153 @@ document.addEventListener('DOMContentLoaded', () => {
             const option = document.createElement('option');
             option.value = talent.id;
             option.textContent = talent.name;
+            option.dataset.description = talent.description;
             talentSelect.appendChild(option);
           });
         });
+
+      fetch(`/operator/${operatorId}/skills`)
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((skill) => {
+            const option = document.createElement('option');
+            option.value = skill.id;
+            option.textContent = skill.name;
+            option.dataset.description = skill.description;
+            skillSelect.appendChild(option);
+          });
+        });
+    } else {
+      trustLabel.textContent = '-';
+      atkLabel.textContent = '-';
+      potLabel.textContent = '-';
+      traitLabel.textContent = '-';
+
+      talentSelect.innerHTML = '<option value="">Вибрати талант</option>';
+      skillSelect.innerHTML = '<option value="">Вибрати навичку</option>';
+      talentDescription.textContent = 'Опис таланту буде тут';
+      skillDescription.textContent = 'Опис навички буде тут';
     }
   });
 
+  // Опис таланту
   talentSelect.addEventListener('change', () => {
-    const talentId = talentSelect.value;
-
-    if (talentId) {
-      // Завантаження опису таланту
-      fetch(`/talent/${talentId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          talentDescription.textContent = data.description;
-        });
-    }
+    const selectedOption = talentSelect.options[talentSelect.selectedIndex];
+    talentDescription.textContent =
+      selectedOption?.dataset.description || 'Опис таланту буде тут';
   });
 
+  // Опис навички
   skillSelect.addEventListener('change', () => {
-    const skillId = skillSelect.value;
-
-    if (skillId) {
-      // Завантаження опису навички
-      fetch(`/skill/${skillId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          skillDescription.textContent = data.description;
-        });
-    }
+    const selectedOption = skillSelect.options[skillSelect.selectedIndex];
+    skillDescription.textContent =
+      selectedOption?.dataset.description || 'Опис навички буде тут';
   });
 
-  // Обчислення пошкоджень
-  document
-    .getElementById('calculate-btn')
-    .addEventListener('click', (event) => {
-      event.preventDefault();
+  // Функція для увімкнення/вимкнення полів ворога
+  const toggleFields = () => {
+    const isEnabled = !enemyCheckbox.checked;
+    [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
+      (input) => (input.disabled = isEnabled),
+    );
+    [percentRadio, valueRadio, defOption, resOption, nothingOption].forEach(
+      (radio) => (radio.disabled = isEnabled),
+    );
 
-      const operatorId = operatorSelect.value;
-      const talentId = talentSelect.value;
-      const skillId = skillSelect.value;
+    if (isEnabled) {
+      [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
+        (input) => (input.value = ''),
+      );
+      percentRadio.checked = false;
+      valueRadio.checked = false;
+      nothingOption.checked = true;
+    }
+  };
 
-      // Запит на сервер для обчислення результатів
-      fetch(`/calculateDPS`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          operatorId,
-          talentId,
-          skillId,
-          // Тут додатково додаємо інші параметри
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // Виведення результатів
-          document.getElementById('dps-standard').textContent =
-            data.dpsStandard;
-          document.getElementById('damage-standard').textContent =
-            data.damageStandard;
-          document.getElementById('percent-standard').textContent =
-            data.percentStandard;
+  // Оновлення полів ворога
+  const updateEnemyFields = () => {
+    const selectedEnemy = enemies.find(
+      (enemy) => enemy.id === parseInt(enemySelect.value, 10),
+    );
+    if (selectedEnemy && enemyCheckbox.checked) {
+      defenseInput.value = selectedEnemy.defense;
+      resistInput.value = selectedEnemy.resist;
+      hpInput.value = selectedEnemy.hp;
+      vulnerabilityInput.value = selectedEnemy.vulnerability;
+      percentRadio.checked = true;
+      nothingOption.checked = true;
+    }
+  };
 
-          document.getElementById('dps-crit').textContent = data.dpsCrit;
-          document.getElementById('damage-crit').textContent = data.damageCrit;
-          document.getElementById('percent-crit').textContent =
-            data.percentCrit;
+  const calculateDamage = (event) => {
+    event.preventDefault(); // Запобігаємо перезавантаженню сторінки
+    console.log('--- Розрахунок пошкодження ---');
 
-          document.getElementById('dps-average').textContent = data.dpsAverage;
-          document.getElementById('damage-average').textContent =
-            data.damageAverage;
-          document.getElementById('percent-average').textContent =
-            data.percentAverage;
-        });
-    });
+    let damage =
+      parseFloat(atkLabel.textContent) +
+      parseFloat(trustLabel.textContent) +
+      parseFloat(potLabel.textContent);
+    console.log('Початкове значення damage:', damage);
+
+    damage *= 1 + parseFloat(modifier1.value || 0) / 100;
+    console.log('Після врахування modifier1:', damage);
+
+    damage *= 1 + parseFloat(modifier2.value || 0) / 100;
+    console.log('Після врахування modifier2:', damage);
+
+    damage += parseFloat(inspiration.value || 0);
+    console.log('Після врахування inspiration:', damage);
+
+    const defense = parseFloat(defenseInput.value || 0);
+    console.log('Захист ворога:', defense);
+
+    const resist = parseFloat(resistInput.value || 0);
+    console.log('Резист ворога:', resist);
+
+    if (defOption.checked) {
+      damage -= defense;
+      console.log('Застосовано захист, нове значення damage:', damage);
+    } else if (resOption.checked) {
+      const resistFactor = Math.max(1 - resist / 100, 0.05);
+      damage *= resistFactor;
+      console.log('Застосовано резист, нове значення damage:', damage);
+    }
+
+    const vulnerabilityValue = parseFloat(vulnerabilityInput.value || 0);
+    console.log('Вразливість ворога:', vulnerabilityValue);
+
+    if (percentRadio.checked) {
+      damage *= 1 + vulnerabilityValue / 100;
+      console.log(
+        'Застосовано вразливість у відсотках, нове значення damage:',
+        damage,
+      );
+    } else if (valueRadio.checked) {
+      damage += vulnerabilityValue;
+      console.log(
+        'Застосовано вразливість у значеннях, нове значення damage:',
+        damage,
+      );
+    }
+
+    // Перевірка на мінімум і максимум
+    const minDamage = parseFloat(atkLabel.textContent) * 0.5;
+    const maxDamage = parseFloat(atkLabel.textContent) * 2;
+    damage = Math.max(minDamage, Math.min(damage, maxDamage));
+
+    console.log('Після перевірки на мінімум і максимум damage:', damage);
+    dpsStandard.textContent = damage.toFixed(2);
+    damageStandard.textContent = damage.toFixed(2);
+    percentStandard.textContent = (damage / 100).toFixed(2);
+  };
+
+  // Вмикаємо та вимикаємо ворога
+  enemyCheckbox.addEventListener('change', toggleFields);
+  enemySelect.addEventListener('change', updateEnemyFields);
+
+  // Кнопка для розрахунку
+  calculateBtn.addEventListener('click', calculateDamage);
+
+  // Оновлюємо поля при завантаженні
+  toggleFields();
 });
