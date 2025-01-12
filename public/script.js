@@ -7,13 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const skillDescription = document.getElementById('skill-description');
   const calculateBtn = document.getElementById('calculate-btn');
 
+  // ------------------- Змінні -------------------
+  const aspdLabel = document.getElementById('aspd-label');
+  const talentAtkInput = document.getElementById('talent-atk-input');
+
   // Ліва частина
   const trustLabel = document.getElementById('trust-label');
   const atkLabel = document.getElementById('atk-label');
   const potLabel = document.getElementById('pot-label');
   const traitLabel = document.getElementById('trait-label');
-  const modifier1 = document.getElementById('modifier1-input');
-  const modifier2 = document.getElementById('modifier2-input');
   const inspiration = document.getElementById('inspiration-input');
 
   // Права частина (враховуючи ворога)
@@ -24,13 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const hpInput = document.getElementById('hp-input');
   const vulnerabilityInput = document.getElementById('vulnerability-input');
   const percentRadio = document.getElementById('vulnerability-percent');
-  const valueRadio = document.getElementById('vulnerability-value');
   const defOption = document.getElementById('def-option');
   const resOption = document.getElementById('res-option');
   const nothingOption = document.getElementById('nothing-option');
-  const dpsStandard = document.getElementById('dps-standard');
-  const damageStandard = document.getElementById('damage-standard');
-  const percentStandard = document.getElementById('percent-standard');
+  const magicResistInput = document.getElementById('magic-resist-input');
 
   // Початкові дані для ворога
   const enemies = [
@@ -59,6 +58,45 @@ document.addEventListener('DOMContentLoaded', () => {
       vulnerability: 25,
     },
   ];
+
+  // Метод для вимкнення/увімкнення полів залежно від чекбокса ворога та вибору радіо кнопок
+  const toggleFields = () => {
+    const isEnemyDisabled = !enemyCheckbox.checked; // Якщо ворог вимкнений
+
+    // Якщо чекбокс увімкнений, вимикаємо селект і скидаємо значення
+    if (enemyCheckbox.checked) {
+      enemySelect.disabled = true;
+      enemySelect.value = ''; // Скидаємо значення на "Вибрати ворога"
+    } else {
+      // Якщо чекбокс вимкнений, дозволяємо редагувати селект
+      enemySelect.disabled = false;
+    }
+
+    // Вимикаємо поля HP та Абсолютний резист, якщо чекбокс ворога вимкнений
+    [hpInput, resistInput].forEach((input) => {
+      input.disabled = isEnemyDisabled;
+    });
+
+    // Вимикаємо або вмикаємо поле захисту (defense-input)
+    if (isEnemyDisabled || !defOption.checked) {
+      defenseInput.disabled = true;
+    } else {
+      defenseInput.disabled = false;
+    }
+
+    // Вимикаємо або вмикаємо поле магічного резисту (magic-resist-input)
+    if (isEnemyDisabled || !resOption.checked) {
+      magicResistInput.disabled = true;
+    } else {
+      magicResistInput.disabled = false;
+    }
+  };
+
+  // Додаємо обробники подій
+  defOption.addEventListener('change', toggleFields);
+  resOption.addEventListener('change', toggleFields);
+  nothingOption.addEventListener('change', toggleFields);
+  enemyCheckbox.addEventListener('change', toggleFields);
 
   // Завантаження операторів
   fetch('/getOperators')
@@ -89,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
           atkLabel.textContent = data.Attack;
           potLabel.textContent = data.Pot_Attack;
           traitLabel.textContent = data.trait;
+          aspdLabel.textContent = data.Aspd;
         });
 
       fetch(`/operator/${operatorId}/talents`)
@@ -127,6 +166,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Завантаження ворогів
+  fetch('/enemies')
+    .then((response) => response.json())
+    .then((data) => {
+      data.forEach((enemy) => {
+        const option = document.createElement('option');
+        option.value = enemy.id;
+        option.textContent = enemy.name;
+        enemySelect.appendChild(option);
+      });
+    });
+
+  // Завантаження характеристик ворога
+  enemySelect.addEventListener('change', () => {
+    const enemyId = enemySelect.value;
+
+    if (enemyId) {
+      fetch(`/enemy/${enemyId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          // Заповнення полів характеристик ворога
+          defenseInput.value = data.Defense;
+          magicResistInput.value = data.res;
+          resistInput.value = data.Resist;
+          hpInput.value = data.MaxHp;
+        });
+    } else {
+      // Очищення полів, якщо ворог не вибраний
+      defenseInput.value = '';
+      magicResistInput.value = '';
+      resistInput.value = '';
+      hpInput.value = '';
+    }
+  });
+
   // Опис таланту
   talentSelect.addEventListener('change', () => {
     const selectedOption = talentSelect.options[talentSelect.selectedIndex];
@@ -140,26 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
     skillDescription.textContent =
       selectedOption?.dataset.description || 'Опис навички буде тут';
   });
-
-  // Функція для увімкнення/вимкнення полів ворога
-  const toggleFields = () => {
-    const isEnabled = !enemyCheckbox.checked;
-    [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
-      (input) => (input.disabled = isEnabled),
-    );
-    [percentRadio, valueRadio, defOption, resOption, nothingOption].forEach(
-      (radio) => (radio.disabled = isEnabled),
-    );
-
-    if (isEnabled) {
-      [defenseInput, resistInput, hpInput, vulnerabilityInput].forEach(
-        (input) => (input.value = ''),
-      );
-      percentRadio.checked = false;
-      valueRadio.checked = false;
-      nothingOption.checked = true;
-    }
-  };
 
   // Оновлення полів ворога
   const updateEnemyFields = () => {
@@ -176,70 +230,322 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const calculateDamage = (event) => {
-    event.preventDefault(); // Запобігаємо перезавантаженню сторінки
-    console.log('--- Розрахунок пошкодження ---');
+  // Функція для розрахунку пошкоджень
+  function calculateDamage() {
+    console.log('=== Початок розрахунку Атаки ===');
 
-    let damage =
-      parseFloat(atkLabel.textContent) +
-      parseFloat(trustLabel.textContent) +
-      parseFloat(potLabel.textContent);
-    console.log('Початкове значення damage:', damage);
+    // Отримуємо базове значення атаки
+    let Atk = parseFloat(atkLabel.textContent) || 0;
+    console.log(`Базова атака: ${Atk}`);
 
-    damage *= 1 + parseFloat(modifier1.value || 0) / 100;
-    console.log('Після врахування modifier1:', damage);
-
-    damage *= 1 + parseFloat(modifier2.value || 0) / 100;
-    console.log('Після врахування modifier2:', damage);
-
-    damage += parseFloat(inspiration.value || 0);
-    console.log('Після врахування inspiration:', damage);
-
-    const defense = parseFloat(defenseInput.value || 0);
-    console.log('Захист ворога:', defense);
-
-    const resist = parseFloat(resistInput.value || 0);
-    console.log('Резист ворога:', resist);
-
-    if (defOption.checked) {
-      damage -= defense;
-      console.log('Застосовано захист, нове значення damage:', damage);
-    } else if (resOption.checked) {
-      const resistFactor = Math.max(1 - resist / 100, 0.05);
-      damage *= resistFactor;
-      console.log('Застосовано резист, нове значення damage:', damage);
+    // Додаємо Потенціал, якщо чекбокс увімкнений
+    if (document.getElementById('pot-checkbox').checked) {
+      const potValue = parseFloat(potLabel.textContent) || 0;
+      Atk += potValue;
+      console.log(`Додано Потенціал (Pot): ${potValue}, Нова Атака: ${Atk}`);
+    } else {
+      console.log('Потенціал не враховується (чекбокс вимкнений)');
     }
 
-    const vulnerabilityValue = parseFloat(vulnerabilityInput.value || 0);
-    console.log('Вразливість ворога:', vulnerabilityValue);
+    // Додаємо Траст, якщо чекбокс увімкнений
+    if (document.getElementById('trust-checkbox').checked) {
+      const trustValue = parseFloat(trustLabel.textContent) || 0;
+      Atk += trustValue;
+      console.log(`Додано Траст (Trust): ${trustValue}, Нова Атака: ${Atk}`);
+    } else {
+      console.log('Траст не враховується (чекбокс вимкнений)');
+    }
 
-    if (percentRadio.checked) {
-      damage *= 1 + vulnerabilityValue / 100;
+    // Додаємо значення з поля Talent Atk
+    const talentAtkValue = parseFloat(talentAtkInput.value) || 0;
+    Atk += talentAtkValue;
+    console.log(`Додано Talent Atk: ${talentAtkValue}, Нова Атака: ${Atk}`);
+
+    console.log(`=== Кінцева Атака: ${Atk} ===`);
+
+    // ------------------- Модифікатори -------------------
+
+    // 1(+) Модифікатор
+    const modifierPlusValue =
+      parseFloat(document.getElementById('modifierPlus-input').value) || 0;
+    Atk *= 1 + modifierPlusValue / 100;
+    console.log(
+      `Додано 1(+) Модифікатор: ${modifierPlusValue}%, Нова Атака: ${Atk}`,
+    );
+
+    // 2(*) Модифікатори
+    const modifier1Value =
+      parseFloat(document.getElementById('modifier1-input').value) || 0;
+    const modifier2Value =
+      parseFloat(document.getElementById('modifier2-input').value) || 0;
+    const modifier3Value =
+      parseFloat(document.getElementById('modifier3-input').value) || 0;
+
+    if (modifier1Value != 0) {
+      Atk *= modifier1Value / 100;
+    }
+    console.log(
+      `Додано 2(*) Модифікатор 1: ${modifier1Value}%, Нова Атака: ${Atk}`,
+    );
+
+    if (modifier2Value != 0) {
+      Atk *= modifier2Value / 100;
+    }
+    console.log(
+      `Додано 2(*) Модифікатор 2: ${modifier2Value}%, Нова Атака: ${Atk}`,
+    );
+
+    if (modifier3Value != 0) {
+      Atk *= modifier3Value / 100;
+    }
+    console.log(
+      `Додано 2(*) Модифікатор 3: ${modifier3Value}%, Нова Атака: ${Atk}`,
+    );
+
+    // Отримуємо фінальний розмір шкоди (standartDamage)
+    const standartDamage = Atk;
+    console.log(
+      `=== Кінцева Атака(після модифікаторів): ${standartDamage} ===`,
+    );
+
+    // ------------------- Крит -------------------
+
+    // Обчислюємо критичний модифікатор, якщо є значення
+    const critChanceValue =
+      parseFloat(document.getElementById('crit-chance-input').value) || 0;
+    const critModifierValue =
+      parseFloat(document.getElementById('crit-modifier-input').value) || 0;
+    const isCrit = critChanceValue > 0 && critModifierValue > 0;
+    let critDamage = standartDamage; // Якщо немає критичного удару, використовуємо стандартний damage
+    if (isCrit) {
+      critDamage = standartDamage * (critModifierValue / 100);
       console.log(
-        'Застосовано вразливість у відсотках, нове значення damage:',
-        damage,
+        `Обчислений Крит: ${critDamage}, Шанс крита: ${critChanceValue}%, Модифікатор крита: ${critModifierValue}%`,
       );
-    } else if (valueRadio.checked) {
-      damage += vulnerabilityValue;
+    } else {
+      console.log('Крит не враховується (Шанс або модифікатор не введено)');
+    }
+
+    // ------------------- Враховуємо Inspiration -------------------
+
+    const inspirationValue = parseFloat(inspiration.value) || 0;
+
+    // Додаємо Inspiration до стандартного damage
+    const finalStandartDamage = standartDamage + inspirationValue;
+    console.log(
+      `Додано Inspiration: ${inspirationValue}, Фінальна стандартна шкода: ${finalStandartDamage}`,
+    );
+
+    // Додаємо Inspiration до критичної шкоди, якщо вона була обчислена
+    if (isCrit) {
+      critDamage += inspirationValue;
       console.log(
-        'Застосовано вразливість у значеннях, нове значення damage:',
-        damage,
+        `Додано Inspiration до критичної шкоди: ${inspirationValue}, Фінальна критична шкода: ${critDamage}`,
       );
     }
 
-    // Перевірка на мінімум і максимум
-    const minDamage = parseFloat(atkLabel.textContent) * 0.5;
-    const maxDamage = parseFloat(atkLabel.textContent) * 2;
-    damage = Math.max(minDamage, Math.min(damage, maxDamage));
+    // Виводимо результати
+    console.log(
+      `=== Кінцева стандартна шкода(після Inspiration): ${finalStandartDamage} ===`,
+    );
+    if (critChanceValue > 0 && critModifierValue > 0) {
+      console.log(
+        `=== Кінцева критична шкода(після Inspiration): ${critDamage} ===`,
+      );
+    }
 
-    console.log('Після перевірки на мінімум і максимум damage:', damage);
-    dpsStandard.textContent = damage.toFixed(2);
-    damageStandard.textContent = damage.toFixed(2);
-    percentStandard.textContent = (damage / 100).toFixed(2);
-  };
+    // ------------------- Захист або Резист -------------------
+
+    const defOptionSelected = document.getElementById('def-option').checked;
+    const resOptionSelected = document.getElementById('res-option').checked;
+    const nothingOptionSelected =
+      document.getElementById('nothing-option').checked;
+
+    const defenseValue = parseFloat(defenseInput.value) || 0;
+    const resistValue = parseFloat(magicResistInput.value) || 0;
+
+    let finalDamage = finalStandartDamage;
+    let finalCritDamage = critDamage;
+
+    if (defOptionSelected) {
+      finalDamage -= defenseValue; // Віднімаємо захист
+      console.log(
+        `Захист враховано, віднято: ${defenseValue}, Нова шкода: ${finalDamage}`,
+      );
+      if (isCrit) {
+        finalCritDamage -= defenseValue;
+        console.log(
+          `Захист враховано, віднято для криту: ${defenseValue}, Нова критична шкода: ${finalCritDamage}`,
+        );
+      }
+    } else if (resOptionSelected) {
+      finalDamage *= 1 - resistValue / 100; // Множимо на резист
+      console.log(
+        `Резист враховано, множимо на: (1 - ${resistValue} / 100), Нова шкода: ${finalDamage}`,
+      );
+      if (isCrit) {
+        finalCritDamage *= 1 - resistValue / 100;
+        console.log(
+          `Резист враховано, множимо на: (1 - ${resistValue} / 100), Нова шкода: ${finalCritDamage}`,
+        );
+      }
+    } else if (nothingOptionSelected) {
+      console.log(
+        'Нічого не змінюється (немає вибору для захисту або резисту)',
+      );
+    }
+
+    // Якщо пошкодження менше 5% фінальної шкоди, встановлюємо його на 5%
+    if (finalDamage < finalStandartDamage * 0.05) {
+      finalDamage = finalStandartDamage * 0.05;
+      console.log(
+        `Шкода менше 5% від початкової, встановлено на 5%: ${finalDamage}`,
+      );
+    }
+    if (finalCritDamage < critDamage * 0.05 && isCrit) {
+      finalCritDamage = critDamage * 0.05;
+      console.log(
+        `Шкода критична менше 5% від початкової, встановлено на 5%: ${finalCritDamage}`,
+      );
+    }
+
+    // Виводимо остаточну шкоду
+    console.log(`=== Остаточна шкода: ${finalDamage} ===`);
+    if (isCrit) {
+      console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+    }
+
+    // ------------------- Абсолютний Резист -------------------
+
+    // Враховуємо абсолютний резист
+    const absoluteResistValue =
+      parseFloat(document.getElementById('resist-input').value) || 0;
+    console.log(absoluteResistValue);
+    if (absoluteResistValue > 0) {
+      finalDamage *= 1 - absoluteResistValue / 100; // Множимо на резист
+      console.log(
+        `Абсолютний резист враховано, множимо на: (1 - ${absoluteResistValue} / 100), Нова шкода: ${finalDamage}`,
+      );
+      if (isCrit) {
+        finalCritDamage *= 1 - absoluteResistValue / 100;
+        console.log(
+          `Абсолютний резист враховано, множимо на: (1 - ${absoluteResistValue} / 100), Нова шкода: ${finalCritDamage}`,
+        );
+      }
+    } else {
+      console.log(`Абсолютний резіст відсутній`);
+    }
+    console.log(`=== Остаточна шкода: ${finalDamage} ===`);
+    console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+
+    // ------------------- Вразливість -------------------
+
+    const vulnerabilityValue =
+      parseFloat(document.getElementById('vulnerability-input').value) || 0;
+    const vulnerabilityType = document.querySelector(
+      'input[name="vulnerability-type"]:checked',
+    ).value; // Відсоток чи значення
+
+    if (vulnerabilityValue > 0) {
+      if (vulnerabilityType === 'percent') {
+        finalDamage *= 1 + vulnerabilityValue / 100; // Якщо відсоток
+        console.log(
+          `Вразливість враховано (Відсоток): ${vulnerabilityValue}%, Нова шкода: ${finalDamage}`,
+        );
+        if (isCrit) {
+          finalCritDamage *= 1 + vulnerabilityValue / 100; // Якщо крит
+          console.log(
+            `Вразливість враховано для криту (Відсоток): ${vulnerabilityValue}%, Нова критична шкода: ${finalCritDamage}`,
+          );
+        }
+      } else if (vulnerabilityType === 'value') {
+        finalDamage += vulnerabilityValue; // Якщо числове значення
+        console.log(
+          `Вразливість враховано (Числове значення): ${vulnerabilityValue}, Нова шкода: ${finalDamage}`,
+        );
+        if (isCrit) {
+          finalCritDamage += vulnerabilityValue; // Якщо крит
+          console.log(
+            `Вразливість враховано для криту (Числове значення): ${vulnerabilityValue}, Нова критична шкода: ${finalCritDamage}`,
+          );
+        }
+      }
+    } else {
+      console.log(`Немає ефекту вразливості у ворога`);
+    }
+
+    // Виводимо остаточну шкоду
+    console.log(`=== Остаточна шкода: ${finalDamage} ===`);
+    console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+
+    // ------------------- ASPD -------------------
+
+    // Отримуємо значення ASPD
+    let aspdValue =
+      parseFloat(document.getElementById('aspd-label').textContent) || 0;
+    console.log(`ASPD початкове значення: ${aspdValue}`);
+
+    // Додаємо або віднімаємо Interval Attack
+    const talentIntervalValue =
+      parseFloat(document.getElementById('talent-interval-input').value) || 0;
+    aspdValue += talentIntervalValue;
+    console.log(
+      `Додано / Віднято Interval Attack: ${talentIntervalValue}, Нова ASPD: ${aspdValue}`,
+    );
+
+    // Коригуємо ASPD з врахуванням Talent ASPD
+    const talentAspdValue =
+      parseFloat(document.getElementById('talent-aspd-input').value) || 0;
+    aspdValue = aspdValue / (1 + talentAspdValue / 100);
+    console.log(
+      `Коригування ASPD з Talent ASPD: ${talentAspdValue}%, Нова ASPD: ${aspdValue}`,
+    );
+    if (aspdValue < 0.05) {
+      aspdValue = 0.05;
+    }
+    //Виводимо ASPD
+    console.log(`=== Остаточне значення ASPD: ${aspdValue} ===`);
+
+    // ------------------- Середнє Пошкодження -------------------
+
+    // Отримуємо HP ворога
+    const enemyHp = parseFloat(document.getElementById('hp-input').value) || 0;
+    console.log(`HP ворога: ${enemyHp}`);
+
+    // Обчислюємо середнє пошкодження
+    const averageDamage =
+      finalDamage * (1 - critChanceValue / 100) +
+      (finalCritDamage * critChanceValue) / 100;
+    console.log(`Середнє пошкодження: ${averageDamage}`);
+
+    // Обчислюємо DPS
+    const dpsStandard = finalDamage / aspdValue;
+    const dpsCrit = finalCritDamage / aspdValue;
+    const dpsAverage = averageDamage / aspdValue;
+    console.log(`DPS стандартне: ${dpsStandard}`);
+    console.log(`DPS критичне: ${dpsCrit}`);
+    console.log(`DPS середнє: ${dpsAverage}`);
+
+    // Виводимо значення на сторінку
+    document.getElementById('dps-standard').textContent =
+      dpsStandard.toFixed(2);
+    document.getElementById('damage-standard').textContent =
+      finalDamage.toFixed(2);
+    document.getElementById('percent-standard').textContent =
+      ((finalDamage / enemyHp) * 100).toFixed(2) + '%';
+    document.getElementById('dps-crit').textContent = dpsCrit.toFixed(2);
+    document.getElementById('damage-crit').textContent =
+      finalCritDamage.toFixed(2);
+    document.getElementById('percent-crit').textContent =
+      ((finalCritDamage / enemyHp) * 100).toFixed(2) + '%';
+    document.getElementById('dps-average').textContent = dpsAverage.toFixed(2);
+    document.getElementById('damage-average').textContent =
+      averageDamage.toFixed(2);
+    document.getElementById('percent-average').textContent =
+      ((averageDamage / enemyHp) * 100).toFixed(2) + '%';
+  }
 
   // Вмикаємо та вимикаємо ворога
-  enemyCheckbox.addEventListener('change', toggleFields);
   enemySelect.addEventListener('change', updateEnemyFields);
 
   // Кнопка для розрахунку

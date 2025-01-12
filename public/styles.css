@@ -86,3 +86,39 @@ input[type='checkbox']:not(:checked) {
   background-color: #ddd; /* сірий фон для чекбоксу */
 }
 
+/* Контейнер для полів на одному рівні */
+.input-group {
+  display: flex;
+  gap: 10px; /* Відстань між полями */
+  flex-wrap: wrap; /* Якщо вміст не поміщається, елементи переходять на новий рядок */
+}
+
+.input-group input {
+  width: 25%; /* Ширина для кожного поля */
+}
+
+/* Вирівнювання лейблів та полів на одному рядку */
+p label {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+p input {
+  display: inline-block;
+  width: auto; /* Якщо потрібно, щоб поле мало ширину залежно від контенту */
+}
+
+/* Контейнер для лейблів та полів на одному рядку */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Відстань між лейблом і полем */
+}
+
+.input-row label {
+  margin: 0; /* Видаляємо відступи з лейблів */
+}
+
+.input-row input {
+  width: auto; /* Поле займає ширину в залежності від контенту */
+}

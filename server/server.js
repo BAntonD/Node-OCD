@@ -47,7 +47,7 @@ app.get('/operators', (req, res) => {
 app.get('/operator/:id', (req, res) => {
   const { id } = req.params;
   const sql =
-    'SELECT id, name, trait, Attack, Pot_Attack, Trust_Attack FROM operator WHERE id = ?';
+    'SELECT id, name, trait, Attack, Pot_Attack, Trust_Attack, Aspd FROM operator WHERE id = ?';
 
   db.query(sql, [id], (err, results) => {
     if (err) {
@@ -101,6 +101,38 @@ app.get('/operator/:id/skills', (req, res) => {
       return;
     }
     res.json(results);
+  });
+});
+
+// Маршрут для отримання ворогів
+app.get('/enemies', (req, res) => {
+  const sql = 'SELECT id, name FROM enemies'; // Вибираємо id та name для всіх ворогів
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Помилка отримання даних з бази:', err.message);
+      return res.status(500).send('Помилка сервера');
+    }
+    res.json(results); // Повертаємо JSON з результатами
+  });
+});
+
+// Маршрут для отримання ворога за id
+app.get('/enemy/:id', (req, res) => {
+  const { id } = req.params;
+  const sql =
+    'SELECT name, Defense, res, Resist, MaxHp FROM enemies WHERE id = ?'; // Вибираємо потрібні поля
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('Помилка отримання даних з бази:', err.message);
+      return res.status(500).send('Помилка сервера');
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send('Ворог не знайдений');
+    }
+
+    res.json(results[0]); // Повертаємо тільки один запис
   });
 });
 
