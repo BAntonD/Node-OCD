@@ -402,13 +402,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `Шкода менше 5% від початкової, встановлено на 5%: ${finalDamage}`,
       );
     }
-    if (finalCritDamage < critDamage * 0.05 && isCrit) {
-      finalCritDamage = critDamage * 0.05;
-      console.log(
-        `Шкода критична менше 5% від початкової, встановлено на 5%: ${finalCritDamage}`,
-      );
+    if (isCrit) {
+      if (finalCritDamage < critDamage * 0.05 && isCrit) {
+        finalCritDamage = critDamage * 0.05;
+        console.log(
+          `Шкода критична менше 5% від початкової, встановлено на 5%: ${finalCritDamage}`,
+        );
+      }
     }
-
     // Виводимо остаточну шкоду
     console.log(`=== Остаточна шкода: ${finalDamage} ===`);
     if (isCrit) {
@@ -436,7 +437,9 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(`Абсолютний резіст відсутній`);
     }
     console.log(`=== Остаточна шкода: ${finalDamage} ===`);
-    console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+    if (isCrit) {
+      console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+    }
 
     // ------------------- Вразливість -------------------
 
@@ -476,7 +479,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Виводимо остаточну шкоду
     console.log(`=== Остаточна шкода: ${finalDamage} ===`);
-    console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+    if (isCrit) {
+      console.log(`=== Остаточна критична шкода: ${finalCritDamage} ===`);
+    }
 
     // ------------------- ASPD -------------------
 
@@ -533,16 +538,26 @@ document.addEventListener('DOMContentLoaded', () => {
       finalDamage.toFixed(2);
     document.getElementById('percent-standard').textContent =
       ((finalDamage / enemyHp) * 100).toFixed(2) + '%';
-    document.getElementById('dps-crit').textContent = dpsCrit.toFixed(2);
-    document.getElementById('damage-crit').textContent =
-      finalCritDamage.toFixed(2);
-    document.getElementById('percent-crit').textContent =
-      ((finalCritDamage / enemyHp) * 100).toFixed(2) + '%';
-    document.getElementById('dps-average').textContent = dpsAverage.toFixed(2);
-    document.getElementById('damage-average').textContent =
-      averageDamage.toFixed(2);
-    document.getElementById('percent-average').textContent =
-      ((averageDamage / enemyHp) * 100).toFixed(2) + '%';
+    if (isCrit) {
+      document.getElementById('dps-crit').textContent = dpsCrit.toFixed(2);
+      document.getElementById('damage-crit').textContent =
+        finalCritDamage.toFixed(2);
+      document.getElementById('percent-crit').textContent =
+        ((finalCritDamage / enemyHp) * 100).toFixed(2) + '%';
+      document.getElementById('dps-average').textContent =
+        dpsAverage.toFixed(2);
+      document.getElementById('damage-average').textContent =
+        averageDamage.toFixed(2);
+      document.getElementById('percent-average').textContent =
+        ((averageDamage / enemyHp) * 100).toFixed(2) + '%';
+    } else {
+      document.getElementById('dps-crit').textContent = ' ';
+      document.getElementById('damage-crit').textContent = ' ';
+      document.getElementById('percent-crit').textContent = ' ';
+      document.getElementById('dps-average').textContent = ' ';
+      document.getElementById('damage-average').textContent = ' ';
+      document.getElementById('percent-average').textContent = ' ';
+    }
   }
 
   // Вмикаємо та вимикаємо ворога
