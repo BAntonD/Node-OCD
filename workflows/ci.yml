@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main # Перевірка запускається для PR у гілку main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout коду
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Встановлення Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Встановлення залежностей
+      - name: Install dependencies
+        run: npm install
+
+      # Перевірка стилю Prettier
+      - name: Check formatting with Prettier
+        run: npm run format-check
+
+      # Перевірка ESLint
+      - name: Lint code with ESLint
+        run: npm run lint
+
+      # Запуск тестів
+      - name: Run tests
+        run: npm run test
+
+      # Перевірка збірки
+      - name: Run build
+        run: npm run build
