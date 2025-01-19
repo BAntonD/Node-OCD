@@ -19,7 +19,9 @@ jobs:
           node-version: '22' # Ваша версія Node.js
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npx husky install  # Додаємо husky install
 
       - name: Run ESLint
         run: npm run lint
