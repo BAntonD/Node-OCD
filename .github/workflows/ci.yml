@@ -20,7 +20,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
           npx husky install  # Додаємо husky install
           chmod +x .husky/*  # Додаємо права на виконання для всіх скриптів Husky
 
