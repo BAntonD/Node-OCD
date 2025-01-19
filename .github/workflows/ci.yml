@@ -33,8 +33,11 @@ jobs:
       - name: Ensure Husky files are executable
         run: chmod -R +x .husky/
 
+      - name: Ensure ESLint is executable
+        run: chmod +x node_modules/.bin/eslint
+
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint .
 
       - name: Run Prettier
         run: npm run format -- --check .
