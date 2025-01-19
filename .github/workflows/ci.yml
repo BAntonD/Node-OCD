@@ -36,6 +36,9 @@ jobs:
       - name: Ensure ESLint is executable
         run: chmod +x node_modules/.bin/eslint
 
+      - name: Ensure ESLint is executable
+        run: chmod +x node_modules/.bin/eslint
+
       - name: Run ESLint
         run: npx eslint .
 
