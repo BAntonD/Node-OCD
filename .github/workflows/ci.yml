@@ -25,7 +25,7 @@ jobs:
         run: npm run lint
 
       - name: Run Prettier
-        run: npm run prettier --check .
+        run: npm run format -- --check .
 
       - name: Run tests
         run: npm test # Передбачає, що у вас є тести
