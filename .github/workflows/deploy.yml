@@ -18,6 +18,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }} # Приватний ключ з секретів GitHub
 
+      - name: Create SSH directory
+        run: mkdir -p ~/.ssh
+
       - name: Add SSH key to known hosts
         run: |
           mkdir -p ~/.ssh
@@ -26,7 +29,6 @@ jobs:
       - name: Test SSH connection
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful'"
-
 
       - name: Deploy to Server
         run: |
