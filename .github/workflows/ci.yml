@@ -20,8 +20,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npx husky install  # Додаємо husky install
-          chmod +x .husky/*  # Додаємо права на виконання для всіх скриптів Husky
+          npm install
+          npx husky install
+          chmod +x .husky/*
 
       - name: Run ESLint
         run: npm run lint
