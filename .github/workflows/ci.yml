@@ -1,0 +1,34 @@
+name: CI Workflow
+
+on:
+  pull_request:
+    branches:
+      - main # або інша ваша основна гілка
+
+jobs:
+  lint_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22' # Ваша версія Node.js
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npx husky install  # Додаємо husky install
+          chmod +x .husky/*  # Додаємо права на виконання для всіх скриптів Husky
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier
+        run: npm run format -- --check .
+
+      - name: Run tests
+        run: npm test # Передбачає, що у вас є тести
