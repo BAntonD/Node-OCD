@@ -18,12 +18,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }} # Приватний ключ з секретів GitHub
 
-      - name: Add SSH key to known hosts
+      - name: Deploy to Server
         run: |
-          mkdir -p ~/.ssh
-          echo "SSH Host: ${{ secrets.SSH_HOST }}"
-          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to server
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /path/to/your/app && git pull && npm install && pm2 restart app"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /path/to/your/project
+            git pull origin main
+            # додайте сюди команду для перезапуску вашого додатку, наприклад:
+            npm install
+            pm2 restart your-app
+          EOF
