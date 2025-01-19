@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: '22' # Ваша версія Node.js
 
+      - name: Ensure Husky files are executable
+        run: chmod -R +x .husky/
+
       - name: Install dependencies
         run: |
           npm install
