@@ -36,11 +36,11 @@ jobs:
       - name: Ensure ESLint is executable
         run: chmod +x node_modules/.bin/eslint
 
-      - name: Ensure ESLint is executable
-        run: chmod +x node_modules/.bin/eslint
-
       - name: Run ESLint
         run: npx eslint .
+
+      - name: Ensure Prettier is executable
+        run: chmod +x node_modules/.bin/prettier
 
       - name: Run Prettier
         run: npm run format -- --check .
