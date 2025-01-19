@@ -3,7 +3,7 @@ name: CD Pipeline
 on:
   push:
     branches:
-      - main  # або ваша основна гілка
+      - main # або ваша основна гілка
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}  # Приватний ключ з секретів GitHub
+          ssh-private-key: ${{ secrets.SSH_KEY }} # Приватний ключ з секретів GitHub
 
       - name: Deploy to Server
         run: |
