@@ -1,7 +1,7 @@
 const assert = require('assert');
 
-describe('Basic test', function () {
+describe('Example Test', function () {
   it('should always pass', function () {
-    assert.strictEqual(1, 1);
+    assert.strictEqual(1 + 1, 2);
   });
 });
