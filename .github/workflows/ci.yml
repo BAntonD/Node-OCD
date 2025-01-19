@@ -1,29 +1,31 @@
-name: CI
+name: CI Workflow
 
 on:
-  pull_request: # Виконується на кожен Pull Request
+  pull_request:
+    branches:
+      - main # або інша ваша основна гілка
 
 jobs:
-  check:
+  lint_and_test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # Або інша версія вашого Node.js
+          node-version: '22' # Ваша версія Node.js
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Check formatting
-        run: npm run format --check
-
-      - name: Lint code
+      - name: Run ESLint
         run: npm run lint
 
+      - name: Run Prettier
+        run: npm run prettier --check .
+
       - name: Run tests
-        run: npm test
+        run: npm test # Передбачає, що у вас є тести

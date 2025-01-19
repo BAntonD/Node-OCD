@@ -8,6 +8,7 @@
     "build": "echo \"No build step specified\" && exit 0",
     "dev": "nodemon index.js",
     "format": "prettier --write .",
+    "prettier": "prettier --check .",
     "lint": "eslint .",
     "prepare": "husky install",
     "commitlint": "commitlint --edit"
