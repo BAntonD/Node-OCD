@@ -18,14 +18,36 @@ jobs:
         with:
           node-version: '22' # Ваша версія Node.js
 
+      - name: Ensure Husky files are executable
+        run: chmod -R +x .husky/
+
+      - name: Install Husky globally
+        run: npm install -g husky
+
       - name: Install dependencies
         run: npm install
 
+      - name: Install Husky
+        run: npx husky install
+
+      - name: Ensure Husky files are executable
+        run: chmod -R +x .husky/
+
+      - name: Ensure ESLint is executable
+        run: chmod +x node_modules/.bin/eslint
+
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint .
+
+      - name: Ensure Prettier is executable
+        run: chmod +x node_modules/.bin/prettier
 
       - name: Run Prettier
         run: npm run format -- --check .
 
+      - name: Ensure Mocha is executable
+        run: chmod +x node_modules/.bin/mocha
+
       - name: Run tests
         run: npm test # Передбачає, що у вас є тести
+
