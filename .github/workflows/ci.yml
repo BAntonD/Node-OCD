@@ -45,6 +45,9 @@ jobs:
       - name: Run Prettier
         run: npm run format -- --check .
 
+      - name: Ensure Mocha is executable
+        run: chmod +x node_modules/.bin/mocha
+
       - name: Run tests
         run: npm test # Передбачає, що у вас є тести
 
