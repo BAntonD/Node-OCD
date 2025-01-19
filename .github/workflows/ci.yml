@@ -18,12 +18,6 @@ jobs:
         with:
           node-version: '22' # Ваша версія Node.js
 
-      - name: Install dependencies
-        run: |
-          npm install
-          npx husky install  # Додаємо husky install
-          chmod +x .husky/*  # Додаємо права на виконання для всіх скриптів Husky
-
       - name: Run ESLint
         run: npm run lint
 
@@ -32,3 +26,10 @@ jobs:
 
       - name: Run tests
         run: npm test # Передбачає, що у вас є тести
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npx husky install  # Додаємо husky install
+          chmod +x .husky/*  # Додаємо права на виконання для всіх скриптів Husky
+
