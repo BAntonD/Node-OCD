@@ -21,9 +21,10 @@ jobs:
       # 3. Створити папку на сервері (якщо її немає)
       - name: Create deployment folder on server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -v ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
-          
-         # 4. Копіювати файли на сервер
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -vvv ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
+
+
+        # 4. Копіювати файли на сервер
       - name: Copy files to server
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
