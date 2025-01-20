@@ -3,36 +3,27 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main # або ваша гілка
+      - master  # Замість master вказати вашу гілку для автоматичного деплою
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Крок 1: Checkout репозиторію
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Крок 2: Налаштування SSH доступу
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
 
-      # Крок 3: Створити папку на сервері
       - name: Create deployment folder on server
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p $DEPLOY_PATH"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${DEPLOY_PATH}"
 
-      # Крок 4: Копіювати файли на сервер
       - name: Copy files to server
         run: |
-          scp -r ./ $USERNAME@$SERVER:$DEPLOY_PATH
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -r ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
 
-      # Крок 5: Запустити серверне середовище (за необхідності)
-      - name: Run server setup
+      - name: Restart server or services
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "cd $DEPLOY_PATH && ./deploy_script.sh"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "systemctl restart your-service"  # Якщо потрібно перезапустити сервіс
