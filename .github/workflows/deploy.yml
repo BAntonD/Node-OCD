@@ -1,44 +1,30 @@
-name: CD Pipeline
+name: (CD) Deploy to Server
 
 on:
   push:
     branches:
-      - main # або ваша основна гілка
+      - master  # або ваша гілка
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Отримати код з репозиторію
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Встановити sshpass
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Install sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
+        run: sudo apt-get install sshpass
 
-      - name: Log SSH credentials
-        run: |
-          echo "USERNAME=${{ secrets.USERNAME }}"
-          echo "SERVER=${{ secrets.SERVER }}"
-          echo "DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}"
-
-      - name: Create deployment folder on server
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -vvv ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
-
-      # 3. Створити папку на сервері (якщо її немає)
       - name: Create deployment folder on server
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
 
-        # 4. Копіювати файли на сервер
-      - name: Copy files to server
+      - name: Deploy to server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
-
-      # 5. Перезапустити сервер (опціонально)
-      - name: Restart application (optional)
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "sudo systemctl restart myapplication"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "cd ${{ secrets.DEPLOY_PATH }} && git pull"
