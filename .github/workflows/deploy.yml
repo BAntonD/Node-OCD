@@ -10,25 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      # 1. Отримати код з репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }} # Приватний ключ з секретів GitHub
+      # 2. Встановити sshpass
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Add SSH key to known hosts
+      # 3. Створити папку на сервері (якщо її немає)
+      - name: Create deployment folder on server
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
 
-      - name: Deploy to server
-        env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          SERVER: ${{ secrets.SERVER }}
-          USERNAME: ${{ secrets.USERNAME }}
+      # 4. Копіювати файли на сервер
+      - name: Copy files to server
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p $DEPLOY_PATH"
-          sshpass -p "$SSH_PASSWORD" scp -r * $USERNAME@$SERVER:$DEPLOY_PATH
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
+
+      # 5. Перезапустити сервер (опціонально)
+      - name: Restart application (optional)
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "sudo systemctl restart myapplication"
