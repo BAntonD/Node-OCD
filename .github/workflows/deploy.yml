@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - master  # Замість master вказати вашу гілку для автоматичного деплою
+      - main # Замість master вказати вашу гілку для автоматичного деплою
 
 jobs:
   deploy:
