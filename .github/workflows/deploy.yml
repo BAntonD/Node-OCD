@@ -3,7 +3,7 @@ name: Deploy with SSH
 on:
   push:
     branches:
-      - main  # Замість main ви можете вказати будь-яку іншу гілку
+      - main # Замість main ви можете вказати будь-яку іншу гілку
 
 jobs:
   deploy:
@@ -15,6 +15,7 @@ jobs:
 
       - name: Set up SSH
         run: |
+          echo "SERVER: $SERVER"
           mkdir -p ~/.ssh
           # Додаємо сервер до відомих хостів для уникнення підтвердження
           ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
