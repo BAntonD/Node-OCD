@@ -23,7 +23,6 @@ jobs:
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -vvv ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
 
-
         # 4. Копіювати файли на сервер
       - name: Copy files to server
         run: |
