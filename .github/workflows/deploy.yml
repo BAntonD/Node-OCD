@@ -3,15 +3,15 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - master  # Або вказуйте свою гілку, наприклад main
+      - main # Або вказуйте свою гілку, наприклад main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Використовуємо Ubuntu для виконання дій
+    runs-on: ubuntu-latest # Використовуємо Ubuntu для виконання дій
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Завантажуємо код з репозиторію
+        uses: actions/checkout@v2 # Завантажуємо код з репозиторію
 
       - name: Set up SSH
         run: |
