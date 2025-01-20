@@ -3,7 +3,7 @@ name: (CD) Deploy to Server
 on:
   push:
     branches:
-      - master  # або ваша гілка
+      - master # або ваша гілка
 
 jobs:
   deploy:
