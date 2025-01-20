@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main # Замість master вказати вашу гілку для автоматичного деплою
+      - main
 
 jobs:
   deploy:
@@ -13,17 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
-        run: sudo apt-get install sshpass
+      - name: Install expect
+        run: sudo apt-get install expect
 
-      - name: Create deployment folder on server
+      - name: Deploy files to server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${DEPLOY_PATH}"
-
-      - name: Copy files to server
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -r ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
-
-      - name: Restart server or services
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "systemctl restart your-service"  # Якщо потрібно перезапустити сервіс
+          expect -c '
+            spawn ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
+            expect "password:"
+            send "${{ secrets.SSH_PASSWORD }}\r"
+            interact
+          '
+          scp -r ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
