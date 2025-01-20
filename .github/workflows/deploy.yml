@@ -3,25 +3,26 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main
+      - master  # Або вказуйте свою гілку, наприклад main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Використовуємо Ubuntu для виконання дій
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  # Завантажуємо код з репозиторію
 
-      - name: Install expect
-        run: sudo apt-get install expect
+      - name: Set up SSH
+        run: |
+          # Створення папки для SSH ключів
+          mkdir -p ~/.ssh
+          # Встановлення доступу до сервера через пароль
+          echo "$SSH_PASSWORD" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
 
       - name: Deploy files to server
         run: |
-          expect -c '
-            spawn ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
-            expect "password:"
-            send "${{ secrets.SSH_PASSWORD }}\r"
-            interact
-          '
-          scp -r ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$SERVER" "mkdir -p $DEPLOY_PATH"  # Створюємо папку для розгортання
+          sshpass -p "$SSH_PASSWORD" scp -r ./ $USERNAME@$SERVER:$DEPLOY_PATH  # Копіюємо файли на сервер
