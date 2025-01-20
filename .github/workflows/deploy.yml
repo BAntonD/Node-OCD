@@ -1,28 +1,31 @@
-name: Deploy to Server
+name: Deploy with SSH
 
 on:
   push:
     branches:
-      - main # Або вказуйте свою гілку, наприклад main
+      - main  # Замість main ви можете вказати будь-яку іншу гілку
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Використовуємо Ubuntu для виконання дій
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2 # Завантажуємо код з репозиторію
+      - name: Check out repository
+        uses: actions/checkout@v2
 
       - name: Set up SSH
         run: |
-          # Створення папки для SSH ключів
           mkdir -p ~/.ssh
-          # Встановлення доступу до сервера через пароль
-          echo "$SSH_PASSWORD" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          # Додаємо сервер до відомих хостів для уникнення підтвердження
           ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-      - name: Deploy files to server
+      - name: Deploy app via SSH
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$SERVER" "mkdir -p $DEPLOY_PATH"  # Створюємо папку для розгортання
-          sshpass -p "$SSH_PASSWORD" scp -r ./ $USERNAME@$SERVER:$DEPLOY_PATH  # Копіюємо файли на сервер
+          # Підключення через sshpass з паролем
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p $DEPLOY_PATH"
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SERVER: ${{ secrets.SERVER }}
+          USERNAME: ${{ secrets.USERNAME }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
