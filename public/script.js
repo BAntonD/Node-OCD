@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(
       `Коригування ASPD з Talent ASPD: ${talentAspdValue}%, Нова ASPD: ${aspdValue}`,
     );
-    if (aspdValue < 0.05) {
+    if (aspdValue < 0.06) {
       aspdValue = 0.05;
     }
     //Виводимо ASPD
