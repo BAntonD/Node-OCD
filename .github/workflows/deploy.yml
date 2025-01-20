@@ -9,9 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-
 steps:
-
   - name: Checkout code
     uses: actions/checkoutgv2
 
@@ -19,7 +17,7 @@ steps:
     run: sudo apt-get install sshpass
 
   - name: Create deployment folder on server
-    run: | 
+    run: |
       sshpass -p "${{ secrets.SSH_PASSNORD }}" ssh -o StricthostKeyCheckingzno ${{ secrets USERNAME }}g${{ secrets. SERVER }}
 
   - name: Copy files to server
@@ -32,5 +30,5 @@ steps:
       DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
 
   - name: Restart server or services
-    run: | 
+    run: |
       sshpass -p “${{ secrets.SSH_PASSHORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets USERNAME }}gS{{ secrets. SERVER }}
