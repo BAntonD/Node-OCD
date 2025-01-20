@@ -9,24 +9,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
 
-      - name: Set up SSH
-        run: |
-          echo "SERVER: $SERVER"
-          mkdir -p ~/.ssh
-          # Додаємо сервер до відомих хостів для уникнення підтвердження
-          ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+steps:
 
-      - name: Deploy app via SSH
-        run: |
-          # Підключення через sshpass з паролем
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p $DEPLOY_PATH"
-        env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          SERVER: ${{ secrets.SERVER }}
-          USERNAME: ${{ secrets.USERNAME }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+  - name: Checkout code
+    uses: actions/checkoutgv2
+
+  - name: Install sshpass
+    run: sudo apt-get install sshpass
+
+  - name: Create deployment folder on server
+    run: | 
+      sshpass -p "${{ secrets.SSH_PASSNORD }}" ssh -o StricthostKeyCheckingzno ${{ secrets USERNAME }}g${{ secrets. SERVER }}
+
+  - name: Copy files to server
+    run: |
+      sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -r ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER }}:${{ secrets.DEPLOY_PATH }}
+    env:
+      SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      USERNAME: ${{ secrets.USERNAME }}
+      SERVER: ${{ secrets.SERVER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+
+  - name: Restart server or services
+    run: | 
+      sshpass -p “${{ secrets.SSH_PASSHORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets USERNAME }}gS{{ secrets. SERVER }}
