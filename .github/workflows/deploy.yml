@@ -1,30 +1,38 @@
-name: (CD) Deploy to Server
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - master # або ваша гілка
+      - main # або ваша гілка
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Крок 1: Checkout репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # Крок 2: Налаштування SSH доступу
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
 
-      - name: Install sshpass
-        run: sudo apt-get install sshpass
-
+      # Крок 3: Створити папку на сервері
       - name: Create deployment folder on server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "mkdir -p ${{ secrets.DEPLOY_PATH }}"
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mkdir -p $DEPLOY_PATH"
 
-      - name: Deploy to server
+      # Крок 4: Копіювати файли на сервер
+      - name: Copy files to server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER }} "cd ${{ secrets.DEPLOY_PATH }} && git pull"
+          scp -r ./ $USERNAME@$SERVER:$DEPLOY_PATH
+
+      # Крок 5: Запустити серверне середовище (за необхідності)
+      - name: Run server setup
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "cd $DEPLOY_PATH && ./deploy_script.sh"
