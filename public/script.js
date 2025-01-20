@@ -1,3 +1,5 @@
+/*
+
 document.addEventListener('DOMContentLoaded', () => {
   // ------------------- Змінні -------------------
   const operatorSelect = document.getElementById('operator-select');
@@ -569,3 +571,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // Оновлюємо поля при завантаженні
   toggleFields();
 });
+*/
